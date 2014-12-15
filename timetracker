@@ -45,6 +45,9 @@ function print_stats {
 			fi
 		fi
 	done
+	if [ "$(tail -n 1 "$TRACKING_FILE" | grep start_time)" != "" ]; then
+		time_sum=$(($time_sum+$(date "+%s")));
+	fi
 	printf "$(pretty_time $time_sum)\n";
 	IFS=$tmp_ifs;
 }

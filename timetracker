@@ -1,0 +1,112 @@
+#!/bin/bash
+
+trap 'stop_time; exit;' SIGINT SIGTERM;
+
+function print_help {
+	echo "
+timetracker is a commandline utility for tracking your time.
+
+Usage:
+	-s) Prints statistics
+	-h) Prints this help page
+	-t) The file to store time to 
+	";
+}
+
+function print_cmds {
+	echo "
+Commands: 
+	stop)	Stops the timetracker (same as Ctrl-C)
+	pause)	Pauses the timetracker
+	resume) Resumes the timetracker
+	help)	Prints this help page
+	";
+}
+
+function print_stats {
+	local tmp_ifs=$IFS;
+	IFS="
+";
+	local time_sum=0;
+	N=$(cat "$TRACKING_FILE" | wc -l);
+	for i in $(seq 1 $N); do
+		local row="$(sed -n "$i p" "$TRACKING_FILE")"
+		if [ "$(echo "$row" | grep "new_session")" != "" ]; then
+			if (($time_sum != 0)); then
+				printf "$(pretty_time $time_sum)\n";
+				time_sum=0;
+			fi
+			printf "Session $(echo $row | awk '{print $2 $3}')\n"
+		else
+			if [ "$(echo $row | grep "start_time")" != "" ]; then
+				time_sum=$(($time_sum-$(echo $row | awk '{print $2}')));
+			else
+				time_sum=$(($time_sum+$(echo $row | awk '{print $2}')));
+			fi
+		fi
+	done
+	printf "$(pretty_time $time_sum)\n";
+	IFS=$tmp_ifs;
+}
+
+function curr_s {
+	date "+%s";
+}
+
+function pretty_date {
+	date "+%Y-%m-%d %H:%M"
+}
+
+function pretty_time {
+	local H=$(($1 / 3600));
+	local M=$((($1 - $H) / 60));
+	echo "$H"h "$M"m; 
+}
+
+function start_time {
+	echo "start_time $(curr_s)" >> "$TRACKING_FILE";
+}
+
+function stop_time {
+	if [ "$(tail -n 1 "$TRACKING_FILE" | grep start_time)" != "" ]; then
+		echo "stop_time $(curr_s)"  >> "$TRACKING_FILE";
+	fi
+}
+
+TRACKING_FILE="";
+
+STATS_MODE=false;
+while getopts sht: option; do
+	case ${option} in
+		s) STATS_MODE=true;;
+		h) print_help; exit;;
+		t) TRACKING_FILE="$OPTARG";;
+	esac
+done
+
+if [ "$TRACKING_FILE" = "" ]; then
+	printf "Enter a file to store time tracking to: ";
+	read TRACKING_FILE;
+fi
+
+if [ $STATS_MODE = true ]; then
+	print_stats;
+	exit;
+fi
+
+echo "Saving time to: $TRACKING_FILE";
+echo "new_session $(pretty_date)" >> "$TRACKING_FILE";
+
+RUNNING=true
+start_time;
+while true; do
+	read CMD
+
+	case ${CMD} in
+		stop) stop_time; exit;;
+		pause) stop_time;;
+		resume) start_time;;
+		help) print_cmds;;
+		*) echo "Invalid command, try help";;
+	esac
+done

@@ -59,7 +59,7 @@ function pretty_date {
 
 function pretty_time {
 	local H=$(($1 / 3600));
-	local M=$((($1 - $H) / 60));
+	local M=$((($1 - ($H * 3600)) / 60));
 	echo "$H"h "$M"m; 
 }
 

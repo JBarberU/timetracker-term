@@ -25,9 +25,11 @@ Commands:
 }
 
 function print_stats {
+	echo "Stats:";
 	local tmp_ifs=$IFS;
 	IFS="
 ";
+	local total_time_sum=0;
 	local time_sum=0;
 	N=$(cat "$TRACKING_FILE" | wc -l);
 	for i in $(seq 1 $N); do
@@ -35,9 +37,10 @@ function print_stats {
 		if [ "$(echo "$row" | grep "new_session")" != "" ]; then
 			if (($time_sum != 0)); then
 				printf "$(pretty_time $time_sum)\n";
+				total_time_sum=$(($total_time_sum + $time_sum));
 				time_sum=0;
 			fi
-			printf "Session $(echo $row | awk '{print $2 $3}')\n"
+			printf "Session $(echo $row | awk '{print $2 $3}'): "
 		else
 			if [ "$(echo $row | grep "start_time")" != "" ]; then
 				time_sum=$(($time_sum-$(echo $row | awk '{print $2}')));
@@ -50,6 +53,8 @@ function print_stats {
 		time_sum=$(($time_sum+$(date "+%s")));
 	fi
 	printf "$(pretty_time $time_sum)\n";
+	total_time_sum=$(($total_time_sum + $time_sum));
+	echo "Total time: $(pretty_time $total_time_sum)";
 	IFS=$tmp_ifs;
 }
 
@@ -68,7 +73,7 @@ function pretty_time {
 }
 
 function start_time {
-	if [ "$(tail -n 1 "$TRACKING_FILE" | grep start_time)" != "" ]; then 
+	if [ "$(tail -n 1 "$TRACKING_FILE" | grep start_time)" = "" ]; then 
 		echo "start_time $(curr_s)" >> "$TRACKING_FILE";
 	fi
 }
@@ -113,7 +118,7 @@ while true; do
 		pause) stop_time;;
 		resume) start_time;;
 		help) print_cmds;;
-		stats) print_stats;;
+		stats) clear; print_stats;;
 		*) echo "Invalid command, try help";;
 	esac
 done

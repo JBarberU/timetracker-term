@@ -19,6 +19,7 @@ stop)	Stops the timetracker (same as Ctrl-C)
 pause)	Pauses the timetracker
 resume) Resumes the timetracker
 help)	Prints this help page
+stats)	Prints statistics
 ```
 
 ## License

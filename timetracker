@@ -20,6 +20,7 @@ Commands:
 	pause)	Pauses the timetracker
 	resume) Resumes the timetracker
 	help)	Prints this help page
+	stats)	Prints statistics
 	";
 }
 
@@ -112,6 +113,7 @@ while true; do
 		pause) stop_time;;
 		resume) start_time;;
 		help) print_cmds;;
+		stats) print_stats;;
 		*) echo "Invalid command, try help";;
 	esac
 done

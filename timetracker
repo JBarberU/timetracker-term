@@ -67,7 +67,9 @@ function pretty_time {
 }
 
 function start_time {
-	echo "start_time $(curr_s)" >> "$TRACKING_FILE";
+	if [ "$(tail -n 1 "$TRACKING_FILE" | grep start_time)" != "" ]; then 
+		echo "start_time $(curr_s)" >> "$TRACKING_FILE";
+	fi
 }
 
 function stop_time {

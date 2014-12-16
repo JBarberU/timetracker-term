@@ -25,7 +25,7 @@ Commands:
 }
 
 function print_stats {
-	echo "Stats:";
+	echo "Stats for $(print_tracking_file)";
 	local tmp_ifs=$IFS;
 	IFS="
 ";
@@ -56,6 +56,10 @@ function print_stats {
 	total_time_sum=$(($total_time_sum + $time_sum));
 	echo "Total time: $(pretty_time $total_time_sum)";
 	IFS=$tmp_ifs;
+}
+
+function print_tracking_file {
+	echo $TRACKING_FILE | sed "s,$(dirname $TRACKING_FILE)/,,g"
 }
 
 function curr_s {
@@ -105,7 +109,7 @@ if [ $STATS_MODE = true ]; then
 	exit;
 fi
 
-echo "Saving time to: $TRACKING_FILE";
+echo "Saving time to: $(print_tracking_file)";
 echo "new_session $(pretty_date)" >> "$TRACKING_FILE";
 
 RUNNING=true

@@ -114,9 +114,9 @@ while true; do
 	read CMD
 
 	case ${CMD} in
-		stop) stop_time; exit;;
-		pause) stop_time;;
-		resume) start_time;;
+		stop) echo "Stopping"; stop_time; exit;;
+		pause) echo "Pausing"; stop_time;;
+		resume) echo "Resuming"; start_time;;
 		help) print_cmds;;
 		stats) clear; print_stats;;
 		*) echo "Invalid command, try help";;

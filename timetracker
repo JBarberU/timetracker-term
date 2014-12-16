@@ -119,6 +119,7 @@ while true; do
 		resume) echo "Resuming"; start_time;;
 		help) print_cmds;;
 		stats) clear; print_stats;;
+		"") clear; print_stats;;
 		*) echo "Invalid command, try help";;
 	esac
 done

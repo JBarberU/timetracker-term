@@ -44,7 +44,7 @@ function print_stats {
 		else
 			if [ "$(echo $row | grep "start_time")" != "" ]; then
 				time_sum=$(($time_sum-$(echo $row | awk '{print $2}')));
-			else
+			elif [ "$(echo $row | grep "stop_time")" != "" ]; then
 				time_sum=$(($time_sum+$(echo $row | awk '{print $2}')));
 			fi
 		fi

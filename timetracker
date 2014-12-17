@@ -40,7 +40,7 @@ function print_stats {
 				total_time_sum=$(($total_time_sum + $time_sum));
 				time_sum=0;
 			fi
-			printf "Session $(echo $row | awk '{print $2 $3}'): "
+			printf "Session $(echo $row | awk '{print $2" "$3}'): "
 		else
 			if [ "$(echo $row | grep "start_time")" != "" ]; then
 				time_sum=$(($time_sum-$(echo $row | awk '{print $2}')));

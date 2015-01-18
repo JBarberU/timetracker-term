@@ -30,9 +30,10 @@ class TimeObject:
     ret = {"session_start": self.session_start}
     entries = []
     for e in self.entries:
-      entry = {e.start: e.start}
-      if e.stop:
+      entry = {"start": e.start}
+      if "stop" in e:
         entry["stop"] = e.stop
+      entrie.append(entry)
 
     ret["entries"] = entries
     return ret
@@ -40,14 +41,21 @@ class TimeObject:
   def print_stats(self):
     sum_time = 0
     running = False
-    for e in self.endries:
-      if not e.stop:
+    for e in self.entries:
+      if "stop" in e:
         running = True
       else:
         sum_time += e.stop - e.start
 
 
     print("%s: %s %s" % (self.session_start, sum_time, "Still running" if running else ""))
+
+  def running(self):
+    if len(self.entries) == 0:
+      return None
+    else:
+      last_entry = self.entries[len(self.entries) - 1]
+      return last_entry if "stop" in last_entry else None
 
 class TimeTracker():
 
@@ -74,12 +82,22 @@ class TimeTracker():
     print("-" * 20)
 
   def save(self):
+    print(json.dumps(self.serialize(), sort_keys=True, indent=2, separators=(',',': ')))
+    return
     with open(self.file_name, "w") as f:
       lines = []
       f.write(json.dumps(self.serialize(), sort_keys=True, indent=2, separators=(',',': ')))
 
   def add_timeobject(self, time_object):
     self.time_objects.append(time_object)
+
+  def running(self):
+    if len(self.time_objects) == 0:
+      return None
+    else:
+      last_object = self.time_objects[len(self.time_objects) - 1]
+      return last_object if last_object.running() else None
+   
 
 def run(tracker):
   keep_running = True
